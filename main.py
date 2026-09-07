@@ -1,87 +1,135 @@
 import streamlit as st
+import sys
+from pathlib import Path
 
-# Page configuration
+# Project root ko Python path mein add karo
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+
+from core.brain import ask_jarvis
+
+
+# ---------------------------------------------------------
+# PAGE CONFIG
+# ---------------------------------------------------------
+
 st.set_page_config(
     page_title="JARVIS AI Assistant",
     page_icon="🤖",
     layout="wide"
 )
 
-# Title
-st.title("🤖 JARVIS AI Assistant")
-st.subheader("Your Personal AI Assistant")
 
-# Online status
+# ---------------------------------------------------------
+# HEADER
+# ---------------------------------------------------------
+
+st.title("🤖 JARVIS AI Assistant")
+st.caption("Your Personal AI Assistant")
+
 st.success("🟢 JARVIS is Online")
 
 st.divider()
 
-# Sidebar
+
+# ---------------------------------------------------------
+# SIDEBAR
+# ---------------------------------------------------------
+
 with st.sidebar:
-    st.header("⚙️ JARVIS Controls")
 
-    if st.button("🔄 Check Status", use_container_width=True):
-        st.success("JARVIS is running!")
+    st.header("⚙️ JARVIS")
 
-    if st.button("🧹 Clear Chat", use_container_width=True):
+    st.write("System Status")
+
+    st.success("🧠 AI Brain: Online")
+    st.success("🌤️ Weather: Online")
+    st.success("🧮 Calculator: Online")
+    st.success("💾 Memory: Online")
+
+    st.divider()
+
+    if st.button(
+        "🧹 Clear Chat",
+        use_container_width=True
+    ):
         st.session_state.messages = []
+        st.rerun()
 
-# Chat history
+
+# ---------------------------------------------------------
+# CHAT MEMORY
+# ---------------------------------------------------------
+
 if "messages" not in st.session_state:
+
     st.session_state.messages = []
 
-# Display previous messages
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.write(message["content"])
 
-# Chat input
-user_input = st.chat_input("Ask JARVIS something...")
+# ---------------------------------------------------------
+# DISPLAY CHAT HISTORY
+# ---------------------------------------------------------
+
+for message in st.session_state.messages:
+
+    with st.chat_message(
+        message["role"]
+    ):
+
+        st.write(
+            message["content"]
+        )
+
+
+# ---------------------------------------------------------
+# USER INPUT
+# ---------------------------------------------------------
+
+user_input = st.chat_input(
+    "Ask JARVIS anything..."
+)
+
 
 if user_input:
-    # Show user message
-    st.session_state.messages.append(
-        {
-            "role": "user",
-            "content": user_input
-        }
-    )
+
+    # User message
+    st.session_state.messages.append({
+        "role": "user",
+        "content": user_input
+    })
 
     with st.chat_message("user"):
+
         st.write(user_input)
 
-    # Temporary response
-    response = (
-        "I'm JARVIS. Your AI assistant is online. "
-        "My AI brain will be connected here next."
-    )
 
-    # Show JARVIS response
+    # JARVIS response
     with st.chat_message("assistant"):
+
+        with st.spinner(
+            "JARVIS is thinking..."
+        ):
+
+            try:
+
+                response = ask_jarvis(
+                    user_input
+                )
+
+            except Exception as error:
+
+                response = (
+                    "Sorry, I encountered an error:\n\n"
+                    f"{error}"
+                )
+
         st.write(response)
 
-    st.session_state.messages.append(
-        {
-            "role": "assistant",
-            "content": response
-        }
-    )
 
-# Features
-st.divider()
+    # Save response
+    st.session_state.messages.append({
+        "role": "assistant",
+        "content": response
+    })
 
-st.subheader("🚀 JARVIS Capabilities")
 
-col1, col2, col3, col4 = st.columns(4)
-
-with col1:
-    st.info("🧠\n\nAI Brain")
-
-with col2:
-    st.info("🎙️\n\nVoice Assistant")
-
-with col3:
-    st.info("👁️\n\nComputer Vision")
-
-with col4:
-    st.info("⚙️\n\nAutomation")
