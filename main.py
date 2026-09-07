@@ -5,31 +5,36 @@ import streamlit as st
 
 
 # =========================================================
-# PROJECT PATH
+# FIND PROJECT ROOT
 # =========================================================
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+CURRENT_FILE = Path(__file__).resolve()
 
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+PROJECT_ROOT = CURRENT_FILE.parent.parent
+CORE_DIR = PROJECT_ROOT / "core"
+
+sys.path.insert(0, str(PROJECT_ROOT))
+sys.path.insert(0, str(CORE_DIR))
 
 
 # =========================================================
-# IMPORT JARVIS BRAIN
+# LOAD JARVIS BRAIN
 # =========================================================
 
 try:
-    from core.brain import ask_jarvis
+    from brain import ask_jarvis
+
     BRAIN_AVAILABLE = True
     BRAIN_ERROR = None
 
 except Exception as error:
+
     BRAIN_AVAILABLE = False
     BRAIN_ERROR = str(error)
 
 
 # =========================================================
-# PAGE CONFIG
+# STREAMLIT CONFIG
 # =========================================================
 
 st.set_page_config(
@@ -45,15 +50,22 @@ st.set_page_config(
 
 st.title("🤖 JARVIS AI Assistant")
 
-st.caption(
+st.write(
     "Your Personal AI Assistant"
 )
 
 
 if BRAIN_AVAILABLE:
-    st.success("🟢 JARVIS is Online")
+
+    st.success(
+        "🟢 JARVIS is Online"
+    )
+
 else:
-    st.error("🔴 JARVIS Brain could not be loaded")
+
+    st.error(
+        "🔴 JARVIS Brain Error"
+    )
 
 
 st.divider()
@@ -65,7 +77,7 @@ st.divider()
 
 with st.sidebar:
 
-    st.header("⚙️ JARVIS Status")
+    st.header("⚙️ JARVIS System")
 
     if BRAIN_AVAILABLE:
         st.success("🧠 AI Brain: Ready")
@@ -82,18 +94,20 @@ with st.sidebar:
         "🧹 Clear Chat",
         use_container_width=True
     ):
+
         st.session_state.messages = []
+
         st.rerun()
 
 
 # =========================================================
-# ERROR INFORMATION
+# BRAIN ERROR
 # =========================================================
 
 if not BRAIN_AVAILABLE:
 
     st.warning(
-        "JARVIS could not load the brain module."
+        "JARVIS could not load the Brain module."
     )
 
     st.code(
@@ -105,7 +119,7 @@ if not BRAIN_AVAILABLE:
 
 
 # =========================================================
-# CHAT HISTORY
+# CHAT MEMORY
 # =========================================================
 
 if "messages" not in st.session_state:
@@ -114,7 +128,7 @@ if "messages" not in st.session_state:
 
 
 # =========================================================
-# DISPLAY CHAT HISTORY
+# SHOW CHAT HISTORY
 # =========================================================
 
 for message in st.session_state.messages:
@@ -129,7 +143,7 @@ for message in st.session_state.messages:
 
 
 # =========================================================
-# CHAT INPUT
+# USER INPUT
 # =========================================================
 
 user_input = st.chat_input(
@@ -138,15 +152,12 @@ user_input = st.chat_input(
 
 
 # =========================================================
-# PROCESS USER MESSAGE
+# JARVIS PROCESSING
 # =========================================================
 
 if user_input:
 
-    # -----------------------------------------------------
-    # USER MESSAGE
-    # -----------------------------------------------------
-
+    # User message
     st.session_state.messages.append(
         {
             "role": "user",
@@ -159,10 +170,7 @@ if user_input:
         st.write(user_input)
 
 
-    # -----------------------------------------------------
-    # JARVIS RESPONSE
-    # -----------------------------------------------------
-
+    # JARVIS response
     with st.chat_message("assistant"):
 
         with st.spinner(
@@ -178,17 +186,14 @@ if user_input:
             except Exception as error:
 
                 response = (
-                    "Sorry, JARVIS encountered an error.\n\n"
-                    f"Error: {error}"
+                    "JARVIS encountered an error:\n\n"
+                    + str(error)
                 )
 
         st.write(response)
 
 
-    # -----------------------------------------------------
-    # SAVE RESPONSE
-    # -----------------------------------------------------
-
+    # Save response
     st.session_state.messages.append(
         {
             "role": "assistant",
@@ -204,7 +209,7 @@ if user_input:
 st.divider()
 
 st.caption(
-    "JARVIS AI Assistant • Built with Python & Streamlit"
+    "JARVIS AI Assistant • Python • Streamlit"
 )
 
 
