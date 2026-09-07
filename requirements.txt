@@ -1,9 +1,4 @@
 requests
-numpy
-SpeechRecognition
-sounddevice
-pyttsx3
-opencv-python
-ultralytics
-psutil
+openai
+python-dotenv
 streamlit
