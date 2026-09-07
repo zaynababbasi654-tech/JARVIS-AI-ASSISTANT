@@ -50,7 +50,7 @@ if GEMINI_API_KEY:
     )
 
 
-MODEL = "gemini-3.7-flash"
+MODEL = "gemini-2.5-flash"
 
 
 # =========================================================
